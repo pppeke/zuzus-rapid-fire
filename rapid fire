@@ -1,0 +1,29 @@
+local Zuzu= {
+    RapidFire = false
+}
+
+
+local RunService = game:GetService("RunService")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local Orginal = {}
+
+RunService.RenderStepped:Connect(function()
+    local tool = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Tool")
+    if tool and tool:FindFirstChild("GunScript") then
+        for _, connection in ipairs(getconnections(tool.Activated)) do
+            local func = connection.Function
+            if func then
+                local funcInfo = debug.getinfo(func)
+                for i = 1, funcInfo.nups do
+                    local c, n = debug.getupvalue(func, i)
+                    if type(c) == "number" then
+                        if not Orginal[i] then
+                            Orginal[i] = c
+                        end
+                        debug.setupvalue(func, i, Zuzu.RapidFire and 0.00000000000000000001 or Orginal[i])
+                    end
+                end
+            end
+        end
+    end
+end)
